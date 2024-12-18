@@ -12,4 +12,5 @@ def api_path(route, app_name, url_path=None):
 
 urlpatterns = [
     api_path("auth/", "users"),
+    api_path("shops/", "shops"),
 ]
