@@ -1,6 +1,6 @@
 from django.contrib.auth import login
 
-from rest_framework import permissions
+from rest_framework.permissions import AllowAny
 from knox.views import (
     LoginView as KnoxLoginView,
     LogoutView as LogoutApiView,
@@ -11,7 +11,7 @@ from .serializers import LoginSerializer, SignupSerializer
 
 
 class LoginApiView(KnoxLoginView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
         user = self.get_validated_user(request.data)
@@ -27,6 +27,8 @@ class LoginApiView(KnoxLoginView):
 
 
 class SignupApiView(LoginApiView):
+    permission_classes = (AllowAny,)
+
     def get_validated_user(self, data):
         serializer = SignupSerializer(data=data)
         serializer.is_valid(raise_exception=True)
