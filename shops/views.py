@@ -6,11 +6,13 @@ from playwright.sync_api import sync_playwright
 
 from commons.shoplus import Shoplus
 
+from .serializers import SearchShopSerializer
+
 
 @api_view(["GET"])
 def search_shop(request):
-    query = request.query_params.get("query")
-    country = request.query_params.get("country").upper()
+    serializer = SearchShopSerializer(data=request.query_params)
+    serializer.is_valid(raise_exception=True)
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -20,6 +22,9 @@ def search_shop(request):
 
         username, password = load_credentials("credentials.env")
         shoplus.login(username, password)
+
+        query = serializer.data["query"]
+        country = serializer.data["country"]
 
         data = shoplus.search_shop(
             query,
