@@ -23,3 +23,5 @@ AUTHENTICATION_BACKENDS = [
 REST_KNOX = {
     "TOKEN_TTL": timedelta(weeks=4),
 }
+
+LOGIN_REDIRECT_URL = ""

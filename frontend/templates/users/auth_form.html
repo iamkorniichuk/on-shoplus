@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load settings %}
+{% load timedelta %}
+
+{% block title %}{{ title }}{% endblock %} 
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        $('#authForm').on('submit', function(event) {
+            event.preventDefault();
+
+            $('#usernameErrors').text('');
+            $('#passwordErrors').text('');
+            $('#errors').text('');
+
+            const username = $('#username').val().trim();
+            const password = $('#password').val().trim();
+            const csrfToken = $('#csrfToken').val();
+
+            $.ajax({
+                url: '{{ url }}',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                data: JSON.stringify({ username: username, password: password }),
+                success: function(data) {
+                    console.log(data);
+                    {% settings "REST_KNOX" as rest_knox %}
+                    Cookies.set('authToken', data.token, {
+                        expires: {{ rest_knox.TOKEN_TTL|seconds }},
+                        path:"/",
+                        domain: "",
+                        secure: true,
+                        sameSite: "Strict",
+                    });
+
+                    document.location.href = "{% settings 'LOGIN_REDIRECT_URL' %}";
+                },
+                error: function(request) {
+                    let response = JSON.parse(request.responseText);
+                    renderErrors("#usernameErrors", response.username);
+                    renderErrors("#passwordErrors", response.password);
+                    renderErrors("#errors", response.non_field_errors);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<form id="authForm">
+    <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <div id="usernameErrors" style="color: red;"></div>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <div id="passwordErrors" style="color: red;"></div>
+    <br>
+    <button type="submit">Login</button>
+    <div id="errors" style="color: red;"></div>
+</form>
+{% endblock %} 
