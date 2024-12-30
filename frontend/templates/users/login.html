@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %} 
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        $('#loginForm').on('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            // Clear previous error messages
+            $('#errorMessage').text('');
+
+            // Get form values
+            const username = $('#username').val().trim();
+            const password = $('#password').val().trim();
+
+            // Make the API request
+            $.ajax({
+                url: '{% url "users:login" %}', // Use Django's URL template tag
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ username: username, password: password }),
+                success: function(data) {
+                    const token = data.token; // Adjust according to your API response structure
+
+                    // Save the token to cookies
+                    document.cookie = `token=${token}; path=/;`;
+
+                    alert('Login successful!');
+                    // Redirect or perform other actions after successful login
+                },
+                error: function(xhr) {
+                    $('#errorMessage').text('Login failed. Please check your credentials.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Login</button>
+    <div id="errorMessage" style="color: red;"></div>
+</form>
+{% endblock %} 
