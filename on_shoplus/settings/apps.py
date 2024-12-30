@@ -12,7 +12,7 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-    "api",
+    "shops",
     "users",
 ]
 
