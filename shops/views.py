@@ -4,7 +4,7 @@ from rest_framework import status
 from environs import Env
 from playwright.sync_api import sync_playwright
 
-from commons.shoplus import Shoplus
+from shoplus import Shoplus
 
 from .serializers import SearchShopSerializer
 

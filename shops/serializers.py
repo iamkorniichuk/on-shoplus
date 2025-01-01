@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from commons.shoplus import Shoplus
+from shoplus import COUNTRY_CODES
 
 
-COUNTRY_CHOICES = list(Shoplus.COUNTRIES_MAP.items())
+COUNTRY_CHOICES = list(COUNTRY_CODES.items())
 
 
 class SearchShopSerializer(serializers.Serializer):
