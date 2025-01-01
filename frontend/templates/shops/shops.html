@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Shops{% endblock %}
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        // Trigger AJAX request on input change in the query field
+        $('#query').on('input', function() {
+            makeRequest();
+        });
+
+        // Trigger AJAX request when country is changed
+        $('#country').on('change', function() {
+            makeRequest();
+        });
+
+        // AJAX request function
+        function makeRequest() {
+            const country = $('#country').val().trim();
+            const query = $('#query').val().trim();
+            debugger
+            $.ajax({
+                url: '{% url "shops:search" %}', // Django URL template tag
+                type: 'GET',
+                contentType: 'application/json',
+                data: { country: country, query: query }, // Send country and query
+                success: function(response) {
+                    renderTable(response);
+                    $('#errorMessage').text('');
+                },
+                /*error: function(xhr) {
+                    $('#errorMessage').text('Request failed.');
+                }*/
+            });
+        }
+
+        function renderTable(shops) {
+            let tableHTML = `<table id="shopsTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Categories</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+            // Check if there are any shops to display
+            if (shops?.length > 0) {
+                shops.forEach(shop => {
+                    tableHTML += `<tr>
+                                    <td>${shop.name}</td>
+                                    <td>${shop.categories.join(', ')}</td>
+                                  </tr>`;
+                });
+            } else {
+                tableHTML += `<tr><td colspan="2">No shops found.</td></tr>`;
+            }
+
+            tableHTML += `</tbody></table>`;
+
+            $('#shopsTableContainer').html(tableHTML);
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<form id="filterForm">
+    <label for="country">Country:</label>
+    <select id="country" name="country" required>
+        <option value="">Select Country</option>
+        {% for code, name in countries.items %}
+            <option value="{{ code }}">{{ name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+
+    <label for="query">Search:</label>
+    <input type="text" id="query" name="query" required>
+    <br>
+
+    <!-- <div id="errorMessage" style="color: red;"></div> -->
+</form>
+
+<div id="shopsTableContainer"></div>
+
+{% endblock %}
+
