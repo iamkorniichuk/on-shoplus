@@ -1,14 +1,16 @@
+COUNTRY_CODES = {
+    "US": "United States",
+    "GB": "United Kingdom",
+    "ID": "Indonesia",
+    "TH": "Thailand",
+    "PH": "Philippines",
+    "VN": "Viet Nam",
+    "MY": "Malaysia",
+    "SG": "Singapore",
+}
+
+
 class Shoplus:
-    COUNTRIES_MAP = {
-        "US": "United States",
-        "GB": "United Kingdom",
-        "ID": "Indonesia",
-        "TH": "Thailand",
-        "PH": "Philippines",
-        "VN": "Viet Nam",
-        "MY": "Malaysia",
-        "SG": "Singapore",
-    }
     _shops = None
 
     def __init__(self, context):
@@ -30,7 +32,7 @@ class Shoplus:
         page.wait_for_url("https://www.shoplus.net/home")
 
     def search_shop(self, query, country):
-        assert country in self.COUNTRIES_MAP.keys()
+        assert country in COUNTRY_CODES.keys()
 
         def handle_api_request(route):
             route.continue_()
@@ -53,7 +55,7 @@ class Shoplus:
 
         page.route("https://www.shoplus.net/api/v1/shop/search?*", handle_api_request)
 
-        country_name = self.COUNTRIES_MAP[country]
+        country_name = COUNTRY_CODES[country]
         country_divs = page.locator('div[title="Country"]').locator("div")
         country_button = country_divs.get_by_text(country_name, exact=True)
 
