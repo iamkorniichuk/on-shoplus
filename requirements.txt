@@ -5,3 +5,4 @@ environs==11.0.0
 playwright==1.49.1
 random-user-agent==1.0.1
 requests==2.32.3
+stripe==11.4.1
