@@ -1,10 +1,12 @@
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 
-from .views import search_shop
+from .viewsets import SearchShopViewSet
 
 
 app_name = "shops"
 
-urlpatterns = [
-    path("", search_shop, name="search"),
-]
+router = SimpleRouter()
+router.register("search", SearchShopViewSet, "search")
+
+urlpatterns = router.urls
