@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load settings %}
+{% load timedelta %}
+
+{% block title %}{{ title }}{% endblock %} 
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        function makeRequest() {
+            $.ajax({
+                url: '{{ url }}',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function(response) {
+                    renderTable(response.result);
+                },
+                error: function() {
+                    renderError();
+                }
+            });
+        }
+
+        function renderError(){
+            let errorHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Something went wrong.</h4>
+                    <p>We were unable to retrieve the shops. It appears the requested table does not exist.</p>
+                    <hr>
+                    <p class="mb-0">If you believe this is an error, please contact support for further assistance.</p>
+                </div>`;
+            $('#shopsTableContainer').html(errorHTML);
+        }
+
+        function renderTable(shops) {
+            let tableHTML = `<table id="shopsTable" class="table table-striped m-4">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Shop</th>
+                                        <th>Categories</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+            for (const key in shops) {
+                if (shops.hasOwnProperty(key)) {
+                    const shopArray = shops[key];
+
+                    if (shopArray.length > 0) {
+                        shopArray.forEach(shop => {
+                            const shopCellStyle = shop.name === key
+                                ? 'background-color: #4CAF50;'  // green
+                                : 'background-color: #D1DB5B;';  // yellow
+
+                            tableHTML += `<tr>
+                                            <td>${key}</td>
+                                            <td style="${shopCellStyle}">${shop.name}</td>
+                                            <td>${shop.categories.length > 0 ? shop.categories.join(', ') : 'No categories'}</td>
+                                          </tr>`;
+                        });
+                    } else {
+                        tableHTML += `<tr><td colspan="3">No shops found for ${key}.</td></tr>`;
+                    }
+                }
+            }
+            tableHTML += `</tbody></table>`;
+            $('#shopsTableContainer').html(tableHTML);
+        }
+
+        makeRequest();
+    });
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="shopsTableContainer"></div>
+{% endblock %} 
