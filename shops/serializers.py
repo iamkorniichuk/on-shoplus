@@ -19,7 +19,7 @@ class SearchShopSerializer(serializers.ModelSerializer):
             "user": {"write_only": True},
         }
 
-    query = serializers.CharField(write_only=True)
+    query = serializers.ListField(child=serializers.CharField(), write_only=True)
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
 
     def create(self, validated_data):
@@ -35,10 +35,13 @@ class SearchShopSerializer(serializers.ModelSerializer):
             query = validated_data.pop("query")
             country = validated_data.pop("country")
 
-            validated_data["result"] = shoplus.search_shop(
-                query,
-                country=country,
-            )
+            result = {}
+            for name in query:
+                result[name] = shoplus.search_shop(
+                    name,
+                    country=country,
+                )
+            validated_data["result"] = result
 
         return super().create(validated_data)
 
