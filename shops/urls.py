@@ -1,11 +1,12 @@
-from rest_framework.routers import SimpleRouter
+from django.urls import path
 
-from .viewsets import SearchShopViewSet
+from .views import SearchShopHistoryView, SearchShopView
 
 
 app_name = "shops"
 
-router = SimpleRouter()
-router.register("search", SearchShopViewSet, "search")
 
-urlpatterns = router.urls
+urlpatterns = [
+    path("", SearchShopView.as_view(), name="search"),
+    path("<int:pk>", SearchShopHistoryView.as_view(), name="history"),
+]

@@ -22,23 +22,10 @@ def signup_view(request):
     return render(request, "users/auth_form.html", context=context)
 
 
-class SearchShopViewSet(
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    renderer_classes = [TemplateHTMLRenderer]
-
-    def get_queryset(self):
-        queryset = SearchShopHistory.objects
-        if self.action != "retrieve":
-            user = self.request.user
-            queryset = queryset.filter(user=user)
-        return queryset.all()
-
-    def retrieve(self, request, *args, **kwargs):
-        obj = self.get_object()
-        context = {
-            "title": "Shops",
-            "url": obj.get_absolute_url(),
-        }
-        return render(request, "shops/detail.html", context=context)
+def history_view(request, pk):
+    obj = SearchShopHistory.objects.get(pk=pk)
+    context = {
+        "title": "Shops",
+        "url": obj.get_absolute_url(),
+    }
+    return render(request, "shops/history.html", context=context)

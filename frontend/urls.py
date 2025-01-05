@@ -1,16 +1,11 @@
 from django.urls import path
-from rest_framework.routers import SimpleRouter
 
-from .views import login_view, signup_view, SearchShopViewSet
-
-
-router = SimpleRouter()
-router.register("shops", SearchShopViewSet, "shops")
-
+from .views import login_view, signup_view, history_view
 
 app_name = "frontend"
 
 urlpatterns = [
     path("login/", login_view, name="login"),
     path("signup/", signup_view, name="signup"),
-] + router.urls
+    path("shops/<int:pk>/", history_view, name="history"),
+]

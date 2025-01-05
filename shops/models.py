@@ -12,7 +12,7 @@ class SearchShopHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
-        return reverse("shops:search-detail", kwargs={"pk": self.pk})
+        return reverse("shops:history", kwargs={"pk": self.pk})
 
     def __str__(self):
         return f"{self.user} {self.created_at}"

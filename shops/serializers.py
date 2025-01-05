@@ -16,7 +16,7 @@ class SearchShopSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("result", "created_at")
         extra_kwargs = {
-            "user": {"write_only": True},
+            "user": {"write_only": True, "required": False},
         }
 
     query = serializers.ListField(child=serializers.CharField(), write_only=True)
