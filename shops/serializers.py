@@ -41,7 +41,10 @@ class SearchShopSerializer(serializers.ModelSerializer):
                     name,
                     country=country,
                 )
-            validated_data["result"] = result
+            validated_data["result"] = {
+                key: result[key]
+                for key in sorted(result.keys(), key=lambda k: not result[k])
+            }
 
         return super().create(validated_data)
 
