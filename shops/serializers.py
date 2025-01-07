@@ -1,4 +1,4 @@
-from environs import Env
+from django.conf import settings
 from rest_framework import serializers
 from playwright.sync_api import sync_playwright
 
@@ -29,7 +29,8 @@ class SearchShopSerializer(serializers.ModelSerializer):
 
             shoplus = Shoplus(context)
 
-            username, password = load_credentials("credentials.env")
+            username = settings.SHOPLUS_USERNAME
+            password = settings.SHOPLUS_PASSWORD
             shoplus.login(username, password)
 
             query = validated_data.pop("query")
@@ -44,13 +45,3 @@ class SearchShopSerializer(serializers.ModelSerializer):
             validated_data["result"] = result
 
         return super().create(validated_data)
-
-
-def load_credentials(env_file):
-    env = Env()
-    env.read_env(env_file)
-
-    username = env.str("SHOPLUS_USERNAME")
-    password = env.str("SHOPLUS_PASSWORD")
-
-    return username, password
