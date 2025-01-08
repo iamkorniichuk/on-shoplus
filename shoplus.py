@@ -1,3 +1,10 @@
+import time
+import requests
+import json
+from urllib.parse import unquote
+from playwright.sync_api import sync_playwright
+
+
 COUNTRY_CODES = {
     "US": "United States",
     "GB": "United Kingdom",
@@ -10,59 +17,85 @@ COUNTRY_CODES = {
 }
 
 
+class ShoplusError(Exception):
+    pass
+
+
+class AuthorizationError(ShoplusError):
+    pass
+
+
+class SubscriptionError(ShoplusError):
+    pass
+
+
+class QuotaError(ShoplusError):
+    pass
+
+
 class Shoplus:
-    _shops = None
+    proxy = "91.196.7.209:3128"  # Free available proxy
 
-    def __init__(self, context):
-        self.context = context
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.token = None
 
-    def login(self, username, password):
-        self.context.clear_cookies()
+    def login(self):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(proxy={"server": f"http://{self.proxy}"})
+            context = browser.new_context()
 
-        page = self.context.new_page()
-        page.goto("https://www.shoplus.net/login")
+            timeout = 30_000
+            context.set_default_timeout(timeout)
 
-        username_input = page.locator('input[type="text"][autocomplete="on"]')
-        username_input.fill(username)
-        password_input = page.locator('input[type="password"]')
-        password_input.fill(password)
-        button = page.locator('button[type="button"]')
-        button.click()
+            page = context.new_page()
+            page.goto("https://www.shoplus.net/login")
 
-        page.wait_for_url("https://www.shoplus.net/home")
+            username_input = page.locator('input[type="text"][autocomplete="on"]')
+            username_input.fill(self.username)
+            password_input = page.locator('input[type="password"]')
+            password_input.fill(self.password)
+            button = page.locator('button[type="button"]')
+            button.click()
 
-    def search_shop(self, query, country):
+            page.wait_for_url("https://www.shoplus.net/home")
+
+            for data in context.cookies():
+                if data["name"] == "authorized-token":
+                    value = unquote(data["value"])
+                    self.token = json.loads(value)["accessToken"]
+
+    def search_shop(self, query, country, size=20):
         assert country in COUNTRY_CODES.keys()
 
-        def handle_api_request(route):
-            route.continue_()
+        params = {
+            "keyword": query,
+            "country_code": country,
+            "sort": "43",
+            "sort_type": "DESC",
+            "size": size,
+        }
+        url = f"https://www.shoplus.net/api/v1/shop/search"
+        headers = {"authorization": self.token}
 
-            response = route.request.response().json()
+        proxies = {
+            "http": f"http://{self.proxy}",
+            "https": f"http://{self.proxy}",
+        }
 
-            if response["success"]:
-                self._shops = self._parse_shops(response["data"])
+        response = requests.get(url, params, headers=headers, proxies=proxies).json()
+        if response["success"]:
+            return self._parse_shops(response)
 
-            error_code = response.get("errorCode") or response.get("error_code")
+        error = response.get("errorCode") or response.get("error_code")
 
-            if error_code == "SUBSCRIBE_NOT_ALLOWED":
-                raise Exception(
-                    "SUBSCRIBE_NOT_ALLOWED` is returned. Try to call `.login()` first."
-                )
-
-        page = self.context.new_page()
-        page.goto(f"https://www.shoplus.net/discovery/shop?keyword={query}")
-        page.wait_for_load_state()
-
-        page.route("https://www.shoplus.net/api/v1/shop/search?*", handle_api_request)
-
-        country_name = COUNTRY_CODES[country]
-        country_divs = page.locator('div[title="Country"]').locator("div")
-        country_button = country_divs.get_by_text(country_name, exact=True)
-
-        country_button.wait_for()
-        country_button.dispatch_event("click")
-
-        return self._shops
+        if error == "TOKEN_INVALID":
+            raise AuthorizationError()
+        if error == "SUBSCRIBE_NOT_ALLOWED":
+            raise SubscriptionError()
+        if error == "SUBSCRIBE_TIMES_LIMITATIONS" or error == "REQUESTS_TOO_FREQUENT":
+            raise QuotaError()
 
     def _parse_shops(self, data):
         results = []

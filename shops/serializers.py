@@ -1,8 +1,7 @@
 from environs import Env
 from rest_framework import serializers
-from playwright.sync_api import sync_playwright
 
-from shoplus import Shoplus, COUNTRY_CODES
+from shoplus import Shoplus, ShoplusError, COUNTRY_CODES
 
 from .models import SearchShopHistory
 
@@ -23,28 +22,27 @@ class SearchShopSerializer(serializers.ModelSerializer):
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
 
     def create(self, validated_data):
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            context = browser.new_context()
+        username, password = load_credentials("credentials.env")
+        shoplus = Shoplus(username, password)
+        shoplus.login()
 
-            shoplus = Shoplus(context)
+        query = validated_data.pop("query")
+        country = validated_data.pop("country")
 
-            username, password = load_credentials("credentials.env")
-            shoplus.login(username, password)
-
-            query = validated_data.pop("query")
-            country = validated_data.pop("country")
-
-            result = {}
-            for name in query:
+        result = {}
+        for name in query:
+            try:
                 result[name] = shoplus.search_shop(
                     name,
                     country=country,
                 )
-            validated_data["result"] = {
-                key: result[key]
-                for key in sorted(result.keys(), key=lambda k: not result[k])
-            }
+            except ShoplusError:
+                pass
+
+        validated_data["result"] = {
+            key: result[key]
+            for key in sorted(result.keys(), key=lambda k: not result[k])
+        }
 
         return super().create(validated_data)
 
