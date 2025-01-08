@@ -1,4 +1,4 @@
-from environs import Env
+from django.conf import settings
 from rest_framework import serializers
 
 from shoplus import Shoplus, ShoplusError, COUNTRY_CODES
@@ -22,7 +22,9 @@ class SearchShopSerializer(serializers.ModelSerializer):
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
 
     def create(self, validated_data):
-        username, password = load_credentials("credentials.env")
+        username = settings.SHOPLUS_USERNAME
+        password = settings.SHOPLUS_PASSWORD
+
         shoplus = Shoplus(username, password)
         shoplus.login()
 
@@ -45,13 +47,3 @@ class SearchShopSerializer(serializers.ModelSerializer):
         }
 
         return super().create(validated_data)
-
-
-def load_credentials(env_file):
-    env = Env()
-    env.read_env(env_file)
-
-    username = env.str("SHOPLUS_USERNAME")
-    password = env.str("SHOPLUS_PASSWORD")
-
-    return username, password
