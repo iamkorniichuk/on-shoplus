@@ -23,6 +23,14 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=32, db_index=True, unique=True)
     stripe_id = models.CharField(max_length=64, blank=True, null=True)
+    referrer = models.ForeignKey(
+        "users.User",
+        models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referrals",
+    )
+    balance = models.FloatField(default=0.0, editable=False, blank=True)
     last_login = None
 
     USERNAME_FIELD = "username"
