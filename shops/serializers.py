@@ -22,11 +22,12 @@ class SearchShopSerializer(serializers.ModelSerializer):
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
 
     def create(self, validated_data):
+        public_key = settings.SHOPLUS_PUBLIC_KEY
+        shoplus = Shoplus(public_key)
+
         username = settings.SHOPLUS_USERNAME
         password = settings.SHOPLUS_PASSWORD
-
-        shoplus = Shoplus(username, password)
-        shoplus.login()
+        shoplus.login(username, password)
 
         query = validated_data.pop("query")
         country = validated_data.pop("country")
