@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -10,7 +12,7 @@ from .serializers import SubscriptionSerializer
 
 PRICE_STRIPE_ID = "price_1QZewDRx6js27MSIw6PWkuwA"
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class SubscriptionViewSet(
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -21,6 +23,7 @@ class SubscriptionViewSet(
     model = Subscription
 
     def get_object(self):
+        print(self.request.user)
         user = self.request.user
         return user.subscription
 
