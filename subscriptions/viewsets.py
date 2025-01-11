@@ -1,6 +1,7 @@
-from rest_framework import status, mixins
+from rest_framework import status, mixins, permissions
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from knox.auth import TokenAuthentication
 import stripe
 
 from subscriptions.models import Subscription
@@ -18,11 +19,13 @@ class SubscriptionViewSet(
     GenericViewSet,
 ):
     serializer_class = SubscriptionSerializer
-    model = Subscription
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get_object(self):
         user = self.request.user
-        return user.subscription
+        subscription = Subscription.objects.filter(user=user).first()
+        return subscription
 
     def create(self, request, *args, **kwargs):
         obj = self.get_object()
