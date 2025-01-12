@@ -1,8 +1,8 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from shoplus.errors import ShoplusError
 from shoplus import Shoplus, COUNTRY_CODES
+from shoplus.errors import ShoplusError
 
 from .models import SearchShopHistory
 

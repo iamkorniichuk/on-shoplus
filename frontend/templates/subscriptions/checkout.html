@@ -267,7 +267,7 @@ td {
 </div>
 
 <script>
-  const stripe = Stripe("pk_test_TYooMQauvdEDq54NiTphI7jx");
+  const stripe = Stripe("pk_test_51QUrQ5CD4T1ii2MYOHcFjb1FNbxAzU0XDKemPFvfuTngy4w2tJto96mKUkQsPQSGuRRY3SmWasgbZu5MlnujK77M001lSSm5bL");
   const elements = stripe.elements();
   const card = elements.create("card");
   card.mount("#card-element");
@@ -287,7 +287,7 @@ td {
     if (error) {
       document.querySelector("#error-message").innerText = error.message;
     } else {
-      fetch("/api/subscriptions/", {
+      fetch("/api/subscription/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

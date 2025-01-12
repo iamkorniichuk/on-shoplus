@@ -1,8 +1,7 @@
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework import status, mixins
+from rest_framework import status, mixins, permissions
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from knox.auth import TokenAuthentication
 import stripe
 
 from subscriptions.models import Subscription
@@ -12,7 +11,7 @@ from .serializers import SubscriptionSerializer
 
 PRICE_STRIPE_ID = "price_1QZewDRx6js27MSIw6PWkuwA"
 
-@method_decorator(csrf_exempt, name='dispatch')
+
 class SubscriptionViewSet(
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -20,12 +19,13 @@ class SubscriptionViewSet(
     GenericViewSet,
 ):
     serializer_class = SubscriptionSerializer
-    model = Subscription
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get_object(self):
-        print(self.request.user)
         user = self.request.user
-        return user.subscription
+        subscription = Subscription.objects.filter(user=user).first()
+        return subscription
 
     def create(self, request, *args, **kwargs):
         obj = self.get_object()
