@@ -9,7 +9,7 @@ from subscriptions.models import Subscription
 from .serializers import SubscriptionSerializer
 
 
-PRICE_STRIPE_ID = "price_1QZewDRx6js27MSIw6PWkuwA"
+PRICE_STRIPE_ID = "price_1QgSKgCD4T1ii2MY91Rm3Dkq"
 
 
 class SubscriptionViewSet(
@@ -29,24 +29,29 @@ class SubscriptionViewSet(
 
     def create(self, request, *args, **kwargs):
         obj = self.get_object()
+        user = self.request.user
+
         if obj:
             stripe.Subscription.resume(obj.stripe_id)
-            data = {"stripe_id": obj.stripe_id}
+            stripe_id = obj.stripe_id
         else:
-            customer = request.user.stripe_id
+            customer = user.stripe_id
             payment_method = request.data.get("payment_method")
+            stripe.PaymentMethod.attach(
+                payment_method,
+                customer=customer,
+            )
             subscription = stripe.Subscription.create(
                 customer=customer,
                 default_payment_method=payment_method,
                 items=[{"price": PRICE_STRIPE_ID}],
             )
-            data = {
-                "stripe_id": subscription.id,
-            }
+            stripe_id = subscription.id
 
+        data = {"stripe_id": stripe_id, "user": user.pk}
         serializer = self.get_serializer(data=data)
         serializer.is_valid()
-        serializer.save(user=self.request.user)
+        serializer.save()
         return Response(
             serializer.to_representation(),
             status=status.HTTP_201_CREATED,

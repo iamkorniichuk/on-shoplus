@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+
+<script>
+    function makeRequest() {
+        fetch("/api/subscriptions/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Token ${getCookie('authToken')}`,
+        },
+        credentials: "omit",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert(JSON.stringify(data));
+        })
+        .catch((err) => console.error(err));
+    }
+
+    makeRequest();
+</script>
+{% endblock %}

@@ -29,3 +29,15 @@ def history_view(request, pk):
         "url": obj.get_absolute_url(),
     }
     return render(request, "shops/history.html", context=context)
+
+def checkout_view(request):
+    context = {
+        "title": "Checkout",
+    }
+    return render(request, "subscriptions/checkout.html", context=context)
+
+def subscription_info_view(request):
+    context = {
+        "title": "Subscription Info",
+    }
+    return render(request, "subscriptions/info.html", context=context)
