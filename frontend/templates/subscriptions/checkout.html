@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load settings %}
 
 {% block title %}{{ title }}{% endblock %}
 
@@ -267,16 +268,10 @@ td {
 </div>
 
 <script>
-  const stripe = Stripe("pk_test_51QUrQ5CD4T1ii2MYOHcFjb1FNbxAzU0XDKemPFvfuTngy4w2tJto96mKUkQsPQSGuRRY3SmWasgbZu5MlnujK77M001lSSm5bL");
+  const stripe = Stripe("{% settings 'STRIPE_PUBLISHABLE_KEY' %}");
   const elements = stripe.elements();
   const card = elements.create("card");
   card.mount("#card-element");
-
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
 
   document.querySelector("#submit-button").addEventListener("click", async () => {
     const { paymentMethod, error } = await stripe.createPaymentMethod({
@@ -291,7 +286,7 @@ td {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Token ${getCookie('authToken')}`,
+          'Authorization': `Token ${Cookies.get('authToken')}`,
         },
         body: JSON.stringify({ payment_method: paymentMethod.id }),
         //credentials: "omit",

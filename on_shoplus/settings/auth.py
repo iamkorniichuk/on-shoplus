@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.urls import reverse_lazy
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -24,4 +26,4 @@ REST_KNOX = {
     "TOKEN_TTL": timedelta(weeks=4),
 }
 
-LOGIN_REDIRECT_URL = ""
+LOGIN_REDIRECT_URL = reverse_lazy("frontend:subscribe")

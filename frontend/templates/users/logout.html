@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load settings %}
+
+{% block title %}{{ title }}{% endblock %} 
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: "{{ url }}",
+            type: 'POST',
+            headers: {
+                'Authorization': `Token ${Cookies.get('authToken')}`,
+            },
+            complete: function(xhr, status) {
+                Cookies.remove('authToken');
+                window.location.href = "{% settings 'LOGIN_REDIRECT_URL' %}";
+            }
+        });
+    });
+</script>
+{% endblock %}

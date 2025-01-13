@@ -14,7 +14,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Token ${getCookie('authToken')}`,
+          'Authorization': `Token ${Cookies.get('authToken')}`,
         },
         credentials: "omit",
       })
