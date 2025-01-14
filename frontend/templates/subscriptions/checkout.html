@@ -259,7 +259,6 @@ td {
     <p class="description text-center">Get access to premium features for just <span class="price">$10/month</span>.</p>
     <form id="subscription-form">
       <div id="card-element" class="input-field">
-        <!-- Stripe card element will be injected here -->
       </div>
       <button type="button" id="submit-button" class="submit-button">Subscribe</button>
     </form>
@@ -289,11 +288,9 @@ td {
           'Authorization': `Token ${Cookies.get('authToken')}`,
         },
         body: JSON.stringify({ payment_method: paymentMethod.id }),
-        //credentials: "omit",
       })
         .then((res) => res.json())
         .then((data) => {
-          alert(JSON.stringify(data));
           window.location.href = "/subscriptions/info/";
         })
         .catch((err) => console.error(err));

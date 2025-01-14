@@ -28,39 +28,34 @@ class SubscriptionViewSet(
         return subscription
 
     def create(self, request, *args, **kwargs):
-        obj = self.get_object()
         user = self.request.user
+        stripe_id = request.data.get("payment_method")
+        payment_method = stripe.PaymentMethod.retrieve(stripe_id)
 
-        if obj:
-            stripe.Subscription.resume(obj.stripe_id)
-            stripe_id = obj.stripe_id
-        else:
-            customer = user.stripe_id
-            payment_method = request.data.get("payment_method")
-            stripe.PaymentMethod.attach(
-                payment_method,
-                customer=customer,
-            )
-            subscription = stripe.Subscription.create(
-                customer=customer,
-                default_payment_method=payment_method,
-                items=[{"price": PRICE_STRIPE_ID}],
-            )
-            stripe_id = subscription.id
+        customer = stripe.Customer.create(
+            name=user.username,
+            payment_method=payment_method,
+            invoice_settings={"default_payment_method": payment_method},
+        )
+        subscription = stripe.Subscription.create(
+            customer=customer,
+            items=[{"price": PRICE_STRIPE_ID}],
+        )
 
-        data = {"stripe_id": stripe_id, "user": user.pk}
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid()
-        serializer.save()
+        user.stripe_id = customer.id
+        user.save()
+
+        instance = Subscription.objects.create(user=user, stripe_id=subscription.id)
+        serializer = self.get_serializer(instance)
         return Response(
-            serializer.to_representation(),
+            serializer.data,
             status=status.HTTP_201_CREATED,
         )
 
     def retrieve(self, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.to_representation())
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
