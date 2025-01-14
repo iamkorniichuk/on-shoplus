@@ -4,6 +4,13 @@ import stripe
 from subscriptions.models import Subscription
 
 
+class PaymentMethodSerializer(serializers.Serializer):
+    payment_method = serializers.CharField()
+
+    def validate_payment_method(self, value):
+        return stripe.PaymentMethod.retrieve(value).id
+
+
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
