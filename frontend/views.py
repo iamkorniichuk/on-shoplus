@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from shops.models import SearchShopHistory
+
+
+User = get_user_model()
 
 
 def login_view(request):
@@ -13,9 +17,15 @@ def login_view(request):
 
 
 def signup_view(request):
+    refferer = request.GET.get("referrer", None)
+    user = User.objects.filter(username=refferer).first()
+    if user:
+        user = user.pk
+
     context = {
         "title": "Sign Up",
         "url": reverse("users:signup"),
+        "refferer": user,
     }
     return render(request, "users/auth_form.html", context=context)
 

@@ -25,7 +25,7 @@
                 headers: {
                     'X-CSRFToken': csrfToken
                 },
-                data: JSON.stringify({ username: username, password: password }),
+                data: JSON.stringify({ username: username, password: password, referrer: {{ referrer }} }),
                 success: function(data) {
                     console.log(data);
                     {% settings "REST_KNOX" as rest_knox %}
@@ -62,7 +62,7 @@
     <input type="password" id="password" name="password" required>
     <div id="passwordErrors" style="color: red;"></div>
     <br>
-    <button type="submit">Login</button>
+    <button type="submit">{{ title }}</button>
     <div id="errors" style="color: red;"></div>
 </form>
 {% endblock %} 
