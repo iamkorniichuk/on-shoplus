@@ -19,7 +19,7 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <nav class="navbar fixed-top navbar-expand-sm navbar-light bg-light ">
       <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -30,17 +30,17 @@
               <a class="nav-link active" aria-current="page" href="#">Shops</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
+              <a class="nav-link" href="/subscriptions/checkout/">Subscription</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     User actions
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="/login/">Log in</a></li>
-                <li><a class="dropdown-item" href="/signup/">Sign Up</a></li>
+                <li><a class="dropdown-item" href="{% url 'frontend:login' %}">Log in</a></li>
+                <li><a class="dropdown-item" href="{% url 'frontend:signup' %}">Sign Up</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/logout">Log Out</a></li>
+                <li><a class="dropdown-item" href="{% url 'frontend:logout' %}">Log Out</a></li>
               </ul>
             </li>
           </ul>
