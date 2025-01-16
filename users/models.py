@@ -30,6 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         related_name="referrals",
     )
+    account_stripe_id = models.CharField(max_length=64, blank=True, null=True)
     balance = models.FloatField(default=0.0, editable=False, blank=True)
     last_login = None
 

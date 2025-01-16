@@ -1,12 +1,17 @@
 from django.contrib.auth import get_user_model
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer as LoginSerializer
 
 
 User = get_user_model()
 
 
-class SignupSerializer(ModelSerializer):
+class StripeUrlsSerializer(serializers.Serializer):
+    refresh_url = serializers.URLField()
+    return_url = serializers.URLField()
+
+
+class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "password", "referrer"]
