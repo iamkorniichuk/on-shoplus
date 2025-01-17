@@ -25,9 +25,8 @@
                 headers: {
                     'X-CSRFToken': csrfToken
                 },
-                data: JSON.stringify({ username: username, password: password, referrer: {{ referrer }} }),
+                data: JSON.stringify({ username: username, password: password, referrer: {{ referrer|default_if_none:"null" }} }),
                 success: function(data) {
-                    console.log(data);
                     {% settings "REST_KNOX" as rest_knox %}
                     Cookies.set('authToken', data.token, {
                         expires: {{ rest_knox.TOKEN_TTL|seconds }},
@@ -44,6 +43,7 @@
                     renderErrors("#usernameErrors", response.username);
                     renderErrors("#passwordErrors", response.password);
                     renderErrors("#errors", response.non_field_errors);
+                    renderErrors("#errors", response.detail);
                 }
             });
         });
@@ -52,17 +52,19 @@
 {% endblock %}
 
 {% block content %}
-<form id="authForm">
-    <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <div id="usernameErrors" style="color: red;"></div>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <div id="passwordErrors" style="color: red;"></div>
-    <br>
-    <button type="submit">{{ title }}</button>
-    <div id="errors" style="color: red;"></div>
-</form>
+<div class="d-flex flex-column justify-content-center">
+    <form id="authForm">
+        <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <div id="usernameErrors" style="color: red;"></div>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <div id="passwordErrors" style="color: red;"></div>
+        <br>
+        <button type="submit">{{ title }}</button>
+        <div id="errors" style="color: red;"></div>
+    </form>
+</div>
 {% endblock %} 

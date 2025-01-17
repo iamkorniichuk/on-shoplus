@@ -17,15 +17,15 @@ def login_view(request):
 
 
 def signup_view(request):
-    refferer = request.GET.get("referrer", None)
-    user = User.objects.filter(username=refferer).first()
+    referrer = request.GET.get("referrer", None)
+    user = User.objects.filter(username=referrer).first()
     if user:
         user = user.pk
 
     context = {
         "title": "Sign Up",
         "url": reverse("users:signup"),
-        "refferer": user,
+        "referrer": user,
     }
     return render(request, "users/auth_form.html", context=context)
 
