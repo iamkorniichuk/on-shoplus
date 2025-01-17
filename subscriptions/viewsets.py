@@ -1,12 +1,15 @@
 from rest_framework import status, mixins, permissions
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+
 from knox.auth import TokenAuthentication
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 import stripe
 
 from subscriptions.models import Subscription
 
-from .serializers import SubscriptionSerializer
+from .serializers import SubscriptionSerializer, PaymentMethodSerializer
 
 
 PRICE_STRIPE_ID = "price_1QgSKgCD4T1ii2MY91Rm3Dkq"
@@ -27,10 +30,12 @@ class SubscriptionViewSet(
         subscription = Subscription.objects.filter(user=user).first()
         return subscription
 
+    @swagger_auto_schema(request_body=PaymentMethodSerializer)
     def create(self, request, *args, **kwargs):
         user = self.request.user
-        stripe_id = request.data.get("payment_method")
-        payment_method = stripe.PaymentMethod.retrieve(stripe_id)
+        serializer = PaymentMethodSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payment_method = serializer.data["payment_method"]
 
         customer = stripe.Customer.create(
             name=user.username,

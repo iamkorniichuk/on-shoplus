@@ -14,10 +14,7 @@ class SearchShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = SearchShopHistory
         fields = "__all__"
-        read_only_fields = ("result", "created_at")
-        extra_kwargs = {
-            "user": {"write_only": True, "required": False},
-        }
+        read_only_fields = ("result", "created_at", "user")
 
     query = serializers.ListField(child=serializers.CharField(), write_only=True)
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
