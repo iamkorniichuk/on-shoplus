@@ -67,3 +67,21 @@ def subscription_info_view(request):
         "title": "Subscription Info",
     }
     return render(request, "subscriptions/info.html", context=context)
+
+def referral_register_view(request):
+    context = {
+        "title": "Register Stripe",
+    }
+    return render(request, "referrals/register.html", context=context)
+
+def referral_success_view(request):
+    context = {
+        "title": "Success",
+    }
+    return render(request, "referrals/success.html", context=context)
+
+def referral_refresh_view(request):
+    context = {
+        "title": "Refresh",
+    }
+    return render(request, "referrals/refresh.html", context=context)

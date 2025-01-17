@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+
+<h1>To proceed you need to register your Stripe account.</h1>
+<button id="goBtn">Go to Stripe page -></button>
+
+<script>
+    data= {
+        "refresh_url": "{{ request.scheme }}://{{ request.get_host }}{% url 'frontend:referral-register' %}",
+        "return_url": "{{ request.scheme }}://{{ request.get_host }}{% url 'frontend:referral-success' %}"
+    }
+
+    function btnHandler() {
+    $.ajax({
+        url: "/api/user/account/",
+        type: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Token ${Cookies.get('authToken')}`,
+        },
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.url) {
+                window.location.href = response.url;
+            } else {
+                console.error("No URL found in the response");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error, "Status:", status);
+            console.error("Response:", xhr.responseText);
+        }
+    });
+}
+
+    document.getElementById("goBtn").addEventListener("click", btnHandler);
+</script>
+
+{% endblock %}
