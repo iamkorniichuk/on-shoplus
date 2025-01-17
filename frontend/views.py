@@ -79,9 +79,3 @@ def referral_success_view(request):
         "title": "Success",
     }
     return render(request, "referrals/success.html", context=context)
-
-def referral_refresh_view(request):
-    context = {
-        "title": "Refresh",
-    }
-    return render(request, "referrals/refresh.html", context=context)
