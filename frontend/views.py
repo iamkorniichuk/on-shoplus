@@ -12,6 +12,7 @@ def login_view(request):
     context = {
         "title": "Login",
         "url": reverse("users:login"),
+        "referrer": None,
     }
     return render(request, "users/auth_form.html", context=context)
 
@@ -55,6 +56,16 @@ def history_view(request, pk):
     return render(request, "shops/history.html", context=context)
 
 
+def history_list_view(request):
+    current_user = request.user
+    queryset = SearchShopHistory.objects.filter(user=current_user).all()
+    context = {
+        "title": "Shops",
+        "queryset": queryset,
+    }
+    return render(request, "shops/history_list.html", context=context)
+
+
 def checkout_view(request):
     context = {
         "title": "Checkout",
@@ -68,11 +79,13 @@ def subscription_info_view(request):
     }
     return render(request, "subscriptions/info.html", context=context)
 
+
 def referral_register_view(request):
     context = {
         "title": "Register Stripe",
     }
     return render(request, "referrals/register.html", context=context)
+
 
 def referral_success_view(request):
     context = {

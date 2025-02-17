@@ -87,16 +87,17 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
           <ul class="navbar-nav justify-content-center">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Shops</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'frontend:history-list' %}">Shops</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/subscriptions/checkout/">Subscription</a>
+              <a class="nav-link" href="{% url 'frontend:subscribe' %}">Subscription</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     User actions
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{% url 'frontend:subscription' %}">My Subscription</a></li>
                 <li><a class="dropdown-item" href="{% url 'frontend:login' %}">Log in</a></li>
                 <li><a class="dropdown-item" href="{% url 'frontend:signup' %}">Sign Up</a></li>
                 <li><hr class="dropdown-divider"></li>

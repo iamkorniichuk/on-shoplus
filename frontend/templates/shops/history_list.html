@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %} 
+
+{% block content %}
+    {% if queryset %}
+        <ul class="list-group">
+            {% for obj in queryset %}
+                <li class="list-group-item">
+                    {{ forloop.counter }}. Result of {{ obj.created_at }}
+                    <a href="{% url 'frontend:shops' pk=obj.id %}">Go to object</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h4>No history</h4>
+    {% endif %}
+{% endblock %} 
