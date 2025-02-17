@@ -8,6 +8,8 @@ from rest_framework import status
 
 import stripe, stripe.error
 
+from .models import InvoicePaidEvent
+
 
 User = get_user_model()
 
@@ -29,6 +31,12 @@ def invoice_paid_webhook(request):
         return HttpResponse(status=status.HTTP_406_NOT_ACCEPTABLE)
 
     invoice = event["data"]["object"]
+    event_id = event["id"]
+
+    obj, created = InvoicePaidEvent.objects.get_or_create(stripe_id=event_id)
+    if not created:
+        return HttpResponse(status=status.HTTP_429_TOO_MANY_REQUESTS)
+
     customer_id = invoice["customer"]
     user = get_object_or_404(User, stripe_id=customer_id)
 
