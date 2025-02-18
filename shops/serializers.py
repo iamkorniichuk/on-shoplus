@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from shoplus import Shoplus, COUNTRY_CODES
-from shoplus.errors import ShoplusError
+from shoplus.errors import ShoplusError, AuthorizationError
 
 from .models import SearchShopHistory
 
@@ -19,7 +19,14 @@ class SearchShopSerializer(serializers.ModelSerializer):
     query = serializers.ListField(child=serializers.CharField(), write_only=True)
     country = serializers.ChoiceField(choices=COUNTRY_CHOICES, write_only=True)
 
-    def create(self, validated_data):
+    def validate(self, attrs):
+        try:
+            self.shoplus = self.login_shoplus()
+            return attrs
+        except AuthorizationError:
+            return serializers.ValidationError("Server's credentials are invalid")
+
+    def login_shoplus(self):
         public_key = settings.SHOPLUS_PUBLIC_KEY
         shoplus = Shoplus(public_key)
 
@@ -27,18 +34,23 @@ class SearchShopSerializer(serializers.ModelSerializer):
         password = settings.SHOPLUS_PASSWORD
         shoplus.login(username, password)
 
+        return shoplus
+
+    def create(self, validated_data):
         query = validated_data.pop("query")
         country = validated_data.pop("country")
 
         result = {}
         for name in query:
             try:
-                result[name] = shoplus.search_shop(
+                result[name] = self.shoplus.search_shop(
                     name,
                     country=country,
                 )
+            except AuthorizationError:
+                self.shoplus = self.login_shoplus()
             except ShoplusError:
-                pass
+                break
 
         validated_data["result"] = {
             key: result[key]

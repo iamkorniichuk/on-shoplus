@@ -46,7 +46,7 @@ class Shoplus:
         error = response.get("errorCode") or response.get("error_code")
 
         if error == "PASSWORD_ERROR":
-            raise AuthorizationError()
+            raise AuthorizationError("Credentials are invalid")
 
     def search_shop(self, query, country, size=20):
         assert country in COUNTRY_CODES.keys()
@@ -73,11 +73,11 @@ class Shoplus:
         error = response.get("errorCode") or response.get("error_code")
 
         if error == "TOKEN_INVALID":
-            raise AuthorizationError()
+            raise AuthorizationError("Token is expired")
         if error == "SUBSCRIBE_NOT_ALLOWED":
-            raise SubscriptionError()
+            raise SubscriptionError("Subscription is expired")
         if error == "SUBSCRIBE_TIMES_LIMITATIONS" or error == "REQUESTS_TOO_FREQUENT":
-            raise QuotaError()
+            raise QuotaError("Too many requests")
 
     def _parse_shops(self, data):
         results = []
