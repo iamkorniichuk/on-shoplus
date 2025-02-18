@@ -235,7 +235,7 @@ td {
       })
         .then((res) => res.json())
         .then((data) => {
-          window.location.href = "/subscriptions/info/";
+          window.location.href = "{% url 'frontend:subscription' %}";
         })
         .catch((err) => console.error(err));
     }
